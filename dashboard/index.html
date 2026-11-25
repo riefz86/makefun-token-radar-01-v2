@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Radar — pre-token protocols ranked by fitted implied value</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-in">
+    <div class="brand"><span class="mark" aria-hidden="true"></span><span class="brand-name">Token Radar</span><span class="model-tag" id="model-tag">radar-3 model</span></div>
+    <p class="top-meta"><span id="snap-date">Snapshot —</span><span>DefiLlama protocol index</span><span>snapshot sealed 2026-11-14</span></p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <h1>Which pre-token protocol is worth farming next?</h1>
+      <p class="lede">The board ranks every protocol in the snapshot that records no token, by what its
+      launch would be worth — launch value from a size curve fitted to the tokens already trading,
+      times the odds it launches at all. The watchlist is the floor ($50M+ TVL, no token on
+      record); the early radar adds every other pre-token protocol below it.</p>
+      <p class="note">“Records no token” is DefiLlama’s record, not proof. Wrapped, staked and bridged
+      products are set aside: their token already trades in another form.</p>
+    </div>
+  </section>
+
+  <section class="kpis" id="kpis" aria-label="Evidence at a glance">
+    <div class="kpi"><span>Walk-forward miss</span><b id="kpi-wf">—</b><i id="kpi-wf-sub">vs flat multiple</i></div>
+    <div class="kpi"><span>Range honesty</span><b id="kpi-range">—</b><i id="kpi-range-sub">held-out caps in range</i></div>
+    <div class="kpi"><span>Odds Brier</span><b id="kpi-brier">—</b><i id="kpi-brier-sub">ten-fold, vs base rate</i></div>
+    <div class="kpi"><span>Terms survived</span><b id="kpi-terms">—</b><i id="kpi-terms-sub">of 4 tested, both tests</i></div>
+    <div class="kpi"><span>Worth farming</span><b id="kpi-farm">—</b><i id="kpi-farm-sub">FARM verdicts of board</i></div>
+    <div class="kpi"><span>Watchlist ranked</span><b id="kpi-watch">—</b><i>every watchlist slug on the board</i></div>
+  </section>
+
+  <section class="panel ledger" id="ledger">
+    <h2>Accounting: every protocol in the snapshot is in exactly one group</h2>
+    <p class="sub" id="ledger-line">—</p>
+    <div class="chips" id="chips">
+      <span class="chip" id="chip-recomputed">board.json recomputed —</span>
+      <span class="chip" id="chip-ranks">ranks 1–N sequential —</span>
+      <span class="chip" id="chip-totals">totals equal —</span>
+      <span class="chip" id="chip-sha">checksum —</span>
+      <span class="chip" id="chip-watch">watchlist —</span>
+      <span class="chip" id="chip-ledger">ledger —</span>
+    </div>
+  </section>
+
+  <section class="panel valid" id="valid">
+    <h2>Out-of-sample validation — the model tested, not asserted</h2>
+    <p class="sub">A term is kept only when it beats the base curve on <b>both</b> tests by at least 1%.
+    The negative control is another protocol’s growth, shuffled: it must not help, and its miss
+    moves by less than 1% — noise, not signal.</p>
+    <table class="vtab">
+      <thead><tr><th scope="col">Check</th><th scope="col">What was measured</th><th scope="col">This model</th><th scope="col">Baseline</th><th scope="col">Verdict</th></tr></thead>
+      <tbody id="valid-rows"></tbody>
+    </table>
+    <p class="sub" id="model-line">—</p>
+    <p class="sub" id="odds-line">—</p>
+    <p class="sub" id="range-line">—</p>
+  </section>
+
+  <section class="controls" aria-label="Board controls">
+    <div class="field">
+      <label for="q">Search</label>
+      <input type="search" id="q" placeholder="Name, category or chain" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="category">Category</label>
+      <select id="category"><option value="all">All categories</option></select>
+    </div>
+    <div class="field">
+      <label for="chain">Chain</label>
+      <select id="chain"><option value="all">All chains</option></select>
+    </div>
+    <div class="field">
+      <label for="sort">Sort by</label>
+      <select id="sort">
+        <option value="implied">Implied value</option>
+        <option value="odds">Launch odds</option>
+        <option value="launch">If launched</option>
+        <option value="tvl">TVL</option>
+        <option value="growth">7-day growth</option>
+        <option value="net">Net $</option>
+        <option value="age">Age with no token</option>
+        <option value="name">Name</option>
+      </select>
+    </div>
+    <div class="field check">
+      <label><input type="checkbox" id="watchonly"> Watchlist only</label>
+    </div>
+    <div class="field tabs" role="group" aria-label="Farm verdict">
+      <button type="button" id="tab-all" aria-pressed="true">All</button>
+      <button type="button" id="tab-farm" aria-pressed="false">Farm</button>
+      <button type="button" id="tab-marginal" aria-pressed="false">Marginal</button>
+      <button type="button" id="tab-skip" aria-pressed="false">Skip</button>
+    </div>
+    <div class="field tabs" role="group" aria-label="Token status">
+      <button type="button" id="tab-pre" aria-pressed="true">Pre-token</button>
+      <button type="button" id="tab-live" aria-pressed="false">Live token</button>
+    </div>
+    <p class="count" id="count">—</p>
+  </section>
+
+  <section class="board-area">
+    <div class="panel table-panel" id="board-panel">
+      <table id="board">
+        <caption>Pre-token protocols, strongest implied value first. Select a row for its model
+        breakdown, farm economics and farm plan.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Rank</th>
+            <th scope="col">Protocol</th>
+            <th scope="col">TVL</th>
+            <th scope="col">7d</th>
+            <th scope="col">Age</th>
+            <th scope="col">Odds</th>
+            <th scope="col">If launched</th>
+            <th scope="col">Implied value</th>
+            <th scope="col">Verdict · Net</th>
+            <th scope="col">Net / hour</th>
+            <th scope="col">Farm plan</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="empty" id="empty" hidden>
+        <h2>No protocol matches that filter</h2>
+        <p>Clear the search or pick another category to see the board again.</p>
+        <button class="button" type="button" id="clear-filters">Clear filters</button>
+      </div>
+    </div>
+  </section>
+
+  <aside class="panel detail" id="detail" aria-labelledby="detail-title" hidden>
+    <div class="detail-head">
+      <div>
+        <span class="kicker" id="detail-kicker">Rank —</span>
+        <h2 id="detail-title">—</h2>
+        <p class="sub" id="detail-sub">—</p>
+      </div>
+      <button class="button" type="button" id="detail-close">Close</button>
+    </div>
+    <section>
+      <h3>Value model — fitted, not asserted</h3>
+      <table class="breakdown" id="breakdown">
+        <thead><tr><th scope="col">Step</th><th scope="col">Input</th><th scope="col">Value</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <p class="sub" id="detail-check">—</p>
+    </section>
+    <section>
+      <h3>Farm economics — the budget</h3>
+      <table class="breakdown" id="budget">
+        <thead><tr><th scope="col">When</th><th scope="col">Step</th><th scope="col">Cost</th><th scope="col">Time</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <p class="sub" id="budget-line">—</p>
+    </section>
+    <section>
+      <h3>Farm plan</h3>
+      <ol class="steps" id="steps"></ol>
+    </section>
+    <p class="note">This protocol records no token in the snapshot. That is DefiLlama's record, not
+    proof it has none — farm it for the activity, not for a guaranteed launch. The economics assume
+    a 5% airdrop pool, a farmer's share of plan size over 2% of TVL (capped at 0.5% of the pool),
+    six transactions of gas, and a 2% annual charge on locked capital.</p>
+  </aside>
+
+  <section class="panel live-panel" id="live-panel" hidden>
+    <h2>Already trading — set aside from the ranking</h2>
+    <p class="sub">These protocols already have a token that trades, so their market cap is a fact, not
+    a model. They are the market the size curve is fitted on, and they are not ranked here.</p>
+    <table id="live-table">
+      <thead><tr><th scope="col">Protocol</th><th scope="col">TVL</th><th scope="col">7d</th><th scope="col">Market cap</th><th scope="col">Token</th></tr></thead>
+      <tbody id="live-rows"></tbody>
+    </table>
+  </section>
+
+  <footer class="foot">
+    <p>Source: DefiLlama protocol index, snapshot <span id="foot-date">—</span>. Implied values are this
+    entry's own claim, computed by the radar-3 model from the snapshot's figures; make.fun makes no
+    claim about them. Nothing on this page reaches the network: every byte it shows is in its data file.</p>
+  </footer>
+</main>
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
